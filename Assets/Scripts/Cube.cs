@@ -1,63 +1,58 @@
 using System.Collections;
 using UnityEngine;
 
-public class Cube : MonoBehaviour
+[RequireComponent(typeof(Renderer))]
+public class Cube : Spawnable
 {
     [SerializeField] private float _displayStep;
     [SerializeField] private float _minLifetime;
     [SerializeField] private float _maxLifetime;
 
-    private CountdownDisplay _countdownDisplay;
-    private Color _startingColor;
-
-    public Cube()
-    {
-        IsTouched = false;
-    }
-
-    public bool IsTouched { get; private set;}
+    private CubeSpawner _cubeSpawner;
+    private BombSpawner _bombSpawner;
+    private Renderer _renderer;
+    private bool _isTouched = false;
+    
+    public bool IsTouched => _isTouched;
 
     private void Awake()
     {
-        _countdownDisplay = GetComponentInChildren<CountdownDisplay>();
+        _renderer = GetComponent<Renderer>();
     }
 
-    private void Start()
+    public void SetSpawners(CubeSpawner cubeSpawner, BombSpawner bombSpawner)
     {
-        _startingColor = GetComponent<Renderer>().material.color;
+        _cubeSpawner = cubeSpawner;
+        _bombSpawner = bombSpawner;
     }
 
-    public void ResetObject(Vector3 position)
-    {
-        IsTouched = false;
-        transform.position = position;
-        transform.rotation = Quaternion.identity;
-        GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        GetComponent<Renderer>().material.color = _startingColor;
-        _countdownDisplay.gameObject.SetActive(false);
-    }
-
-    public void Touch(Spawner spawner)
+    public void Touch()
     {
         float lifetime = Random.Range(_minLifetime, _maxLifetime);
-        GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-        IsTouched = true;
-        _countdownDisplay.gameObject.SetActive(true);
-        StartCoroutine(ReturnToPool(spawner, lifetime));
+        _renderer.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        _isTouched = true;
+        CountdownDisplay.gameObject.SetActive(true);
+        StartCoroutine(ReturnToPool(lifetime));
     }
 
-    private IEnumerator ReturnToPool(Spawner spawner, float lifetime)
+    public override void ResetObject(Vector3 position)
+    {
+        base.ResetObject(position);
+        _isTouched = false;
+    }
+
+    private IEnumerator ReturnToPool(float lifetime)
     {
         var wait = new WaitForSeconds(_displayStep);
 
         for (float i = lifetime; i > 0; i -= _displayStep)
         {
-            _countdownDisplay.UpdateCountdown(i);
+            CountdownDisplay.UpdateCountdown(i);
             yield return wait;
         }
 
-        spawner.Release(this);
+        _bombSpawner.SpawnAtPosition(transform.position);
+        _cubeSpawner.Release(this);
     }
 }
     

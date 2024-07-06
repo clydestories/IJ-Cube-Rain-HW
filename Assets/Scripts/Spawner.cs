@@ -1,24 +1,20 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class Spawner : MonoBehaviour
+public abstract class Spawner<T> : MonoBehaviour where T : Spawnable
 {
-    [SerializeField] private Cube _prefab;
-    [SerializeField] private Transform _spawnAreaStartPoint;
-    [SerializeField] private Transform _spawnAreaEndPoint;
+    [SerializeField] protected T Prefab;
+
     [SerializeField] private int _poolCapacity;
     [SerializeField] private int _poolSize;
-    [SerializeField] private float _delay;
 
-    private ObjectPool<Cube> _pool;
+    private ObjectPool<T> _pool;
 
     private void Awake()
     {
-        Vector3 spawnPosition = GetSpawnPosition();
-
-        _pool = new ObjectPool<Cube>
+        _pool = new ObjectPool<T>
             (
-                createFunc: () => Instantiate(_prefab, spawnPosition, Quaternion.identity),
+                createFunc: () => OnCreate(),
                 actionOnGet: (obj) => ActionOnGet(obj),
                 actionOnRelease: (obj) => obj.gameObject.SetActive(false),
                 actionOnDestroy: (obj) => Destroy(obj),
@@ -28,32 +24,27 @@ public class Spawner : MonoBehaviour
             );
     }
 
-    private void Start()
-    {
-        InvokeRepeating(nameof(GetCube), _delay, _delay);
-    }
-
-    private Vector3 GetSpawnPosition()
-    {
-        float positionX = Random.Range(_spawnAreaStartPoint.position.x, _spawnAreaEndPoint.position.x);
-        float positionZ = Random.Range(_spawnAreaStartPoint.position.z, _spawnAreaEndPoint.position.z);
-        return new Vector3 (positionX, _spawnAreaStartPoint.position.y, positionZ);
-    }
-
-    private void ActionOnGet(Cube cube)
-    {
-        Vector3 spawnPosition = GetSpawnPosition();
-        cube.ResetObject(spawnPosition);
-        cube.gameObject.SetActive(true);
-    }
-
-    private void GetCube()
+    public void GetInstance()
     {
         _pool.Get();
     }
 
-    public void Release(Cube cube)
+    public void Release(T instance)
     {
-        _pool.Release(cube);
+        _pool.Release(instance);
+    }
+
+    protected abstract Vector3 GetSpawnPosition();
+
+    protected virtual T OnCreate()
+    {
+        return Instantiate(Prefab, Vector3.zero, Quaternion.identity);
+    }
+
+    private void ActionOnGet(T instance)
+    {
+        Vector3 spawnPosition = GetSpawnPosition();
+        instance.ResetObject(spawnPosition);
+        instance.gameObject.SetActive(true);
     }
 }

@@ -8,6 +8,8 @@ public class CountdownDisplay : MonoBehaviour
     [SerializeField] private Color _endColor;
     [SerializeField] private AnimationCurve _colorBehaviour;
 
+    private string _textFormat = "F2";
+
     private Camera _camera;
 
     private void Start()
@@ -22,8 +24,7 @@ public class CountdownDisplay : MonoBehaviour
 
     public void UpdateCountdown(float time)
     {
-        _text.text = time.ToString("F2");
+        _text.text = time.ToString(_textFormat);
         _text.color = Color.Lerp(_startColor, _endColor, _colorBehaviour.Evaluate(time));
     }
-
 }
