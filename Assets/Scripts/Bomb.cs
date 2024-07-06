@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class Bomb : Spawnable
 {
-    [SerializeField] float _explosionForce;
-    [SerializeField] float _explosionRadius;
-    [SerializeField] float _displayStep;
-    [SerializeField] float _minDelay;
-    [SerializeField] float _maxDelay;
-    [SerializeField] ParticleSystem _explosion;
+    [SerializeField] private float _explosionForce;
+    [SerializeField] private float _explosionRadius;
+    [SerializeField] private float _displayStep;
+    [SerializeField] private float _minDelay;
+    [SerializeField] private float _maxDelay;
+    [SerializeField] private ParticleSystem _explosion;
 
     private BombSpawner _bombSpawner;
 
