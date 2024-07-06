@@ -16,7 +16,6 @@ public class Bomb : Spawnable
     {
         float delay = Random.Range(_minDelay, _maxDelay);
         StartCoroutine(StartCountdown(delay));
-        CountdownDisplay.gameObject.SetActive(true);
     }
 
     public void SetSpawner(BombSpawner bombSpawner)

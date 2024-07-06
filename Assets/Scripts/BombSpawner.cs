@@ -15,7 +15,7 @@ public class BombSpawner : Spawner<Bomb>
         return _currentSpawnPosition;
     }
 
-    protected override Bomb OnCreate()
+    protected override Bomb OnCreate() 
     {
         Bomb bomb = Instantiate(Prefab, Vector3.zero, Quaternion.identity);
         bomb.SetSpawner(this);

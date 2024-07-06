@@ -34,10 +34,12 @@ public class CubeSpawner : Spawner<Cube>
 
     private IEnumerator Spawn()
     {
+        var wait = new WaitForSeconds(_delay);
+
         while (true)
         {
             GetInstance();
-            yield return new WaitForSeconds(_delay);
+            yield return wait;
         }
     }
 }

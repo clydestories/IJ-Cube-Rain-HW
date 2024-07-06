@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Renderer))]
 public class Cube : Spawnable
 {
     [SerializeField] private float _displayStep;
@@ -10,15 +9,9 @@ public class Cube : Spawnable
 
     private CubeSpawner _cubeSpawner;
     private BombSpawner _bombSpawner;
-    private Renderer _renderer;
     private bool _isTouched = false;
     
     public bool IsTouched => _isTouched;
-
-    private void Awake()
-    {
-        _renderer = GetComponent<Renderer>();
-    }
 
     public void SetSpawners(CubeSpawner cubeSpawner, BombSpawner bombSpawner)
     {
@@ -29,7 +22,7 @@ public class Cube : Spawnable
     public void Touch()
     {
         float lifetime = Random.Range(_minLifetime, _maxLifetime);
-        _renderer.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        Renderer.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
         _isTouched = true;
         CountdownDisplay.gameObject.SetActive(true);
         StartCoroutine(ReturnToPool(lifetime));
@@ -38,6 +31,7 @@ public class Cube : Spawnable
     public override void ResetObject(Vector3 position)
     {
         base.ResetObject(position);
+        CountdownDisplay.gameObject.SetActive(false);
         _isTouched = false;
     }
 
